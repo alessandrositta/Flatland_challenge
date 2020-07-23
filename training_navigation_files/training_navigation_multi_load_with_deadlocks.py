@@ -45,7 +45,8 @@ def main(argv):
     np.random.seed(1)
 
     # Parameters for the Environment
-    multi_agent_setup = 3
+    multi_agent_setup = 5
+    
     # 3 agents
     if multi_agent_setup == 3:
         x_dim = 40
@@ -73,6 +74,14 @@ def main(argv):
         max_rails_between_cities = 4
         max_rails_in_city = 4
 
+    if multi_agent_setup == 8:
+        x_dim = 16*4
+        y_dim = 9*4
+        n_agents = 7
+        max_num_cities = 9
+        max_rails_between_cities = 5
+        max_rails_in_city = 5
+
     # Use a the malfunction generator to break agents from time to time
 #    stochastic_data = {'malfunction_rate': 8000,  # Rate of malfunction occurence of single agent
 #                       'min_duration': 15,  # Minimal duration of malfunction
@@ -95,7 +104,7 @@ def main(argv):
                   height=y_dim,
                   rail_generator=sparse_rail_generator(max_num_cities=max_num_cities,
                                                        # Number of cities in map (where train stations are)
-                                                       seed=1,  # Random seed
+                                                       seed=38,  # Random seed
                                                        grid_mode=False,
                                                        max_rails_between_cities=max_rails_between_cities,
                                                        max_rails_in_city=max_rails_in_city),
@@ -130,7 +139,7 @@ def main(argv):
     max_steps = int(3 * (env.height + env.width))
 
     # Define training parameters
-    eps = 1.
+    eps = 0.5
     eps_end = 0.005
     eps_decay = 0.998
 
@@ -155,6 +164,11 @@ def main(argv):
     update_values = False
     # Now we load a Double dueling DQN agent
     agent = Agent(state_size, action_size)
+
+    # Load pre-trained agent
+    agent.qnetwork_local.load_state_dict(torch.load(path.join('NetsLoad' , 'navigator_checkpoint3800_multi5_deadlock_global10.pth')))
+
+
 
     for trials in range(1, n_trials + 1):
 

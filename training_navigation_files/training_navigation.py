@@ -26,9 +26,9 @@ from flatland.envs.predictions import  ShortestPathPredictorForRailEnv
 from os import path
 
 
-#print(torch.cuda.current_device())
-#print(torch.cuda.is_available())
-#print(torch.cuda.get_device_name(device=0))
+print(torch.cuda.current_device())
+print(torch.cuda.is_available())
+print(torch.cuda.get_device_name(device=0))
 
 
 def main(argv):
@@ -45,33 +45,27 @@ def main(argv):
     np.random.seed(1)
 
     # Parameters for the Environment
-    multi_agent_setup = 3
-    # 3 agents
-    if multi_agent_setup == 3:
-        x_dim = 40
-        y_dim = 40
-        n_agents = 3
-        max_num_cities = 4
-        max_rails_between_cities = 2
-        max_rails_in_city = 3
+    #x_dim = 35 # 40
+    #y_dim = 35 # 40
+    #n_agents = 1 # 3
+    #max_num_cities = 3 # 4
+    #max_rails_between_cities = 2 # 2
+    #max_rails_in_city = 3 # 3
 
-    # Multi agent (5)
-    if multi_agent_setup == 5:
-        x_dim = 16*3
-        y_dim = 9*3
-        n_agents = 5
-        max_num_cities = 5
-        max_rails_between_cities = 2
-        max_rails_in_city = 3
+    x_dim = 40
+    y_dim = 40
+    n_agents = 3
+    max_num_cities = 4
+    max_rails_between_cities = 2
+    max_rails_in_city = 3
 
-    # Multi agent (7)
-    if multi_agent_setup == 7:
-        x_dim = 16*4
-        y_dim = 9*4
-        n_agents = 7
-        max_num_cities = 7
-        max_rails_between_cities = 4
-        max_rails_in_city = 4
+    x_dim = 16*4
+    y_dim = 9*4
+    n_agents = 1
+    max_num_cities = 9
+    max_rails_between_cities = 5
+    max_rails_in_city = 5
+
 
     # Use a the malfunction generator to break agents from time to time
 #    stochastic_data = {'malfunction_rate': 8000,  # Rate of malfunction occurence of single agent
@@ -108,9 +102,9 @@ def main(argv):
     env.reset(True, True)
 
     # After training we want to render the results so we also load a renderer
-    env_renderer = RenderTool(env, gl="PILSVG", 
-                                   screen_height=800,  # Adjust these parameters to fit your resolution
-                                   screen_width=900)
+#    env_renderer = RenderTool(env, gl="PILSVG", 
+ #                                   screen_height=1040,  # Adjust these parameters to fit your resolution
+  #                                  screen_width=1890)
     # Given the depth of the tree observation and the number of features per node we get the following state_size
     num_features_per_node = env.obs_builder.observation_dim
 
@@ -139,8 +133,6 @@ def main(argv):
     final_action_dict = dict()
     scores_window = deque(maxlen=100)
     done_window = deque(maxlen=100)
-    deadlock_window = deque(maxlen=100)
-    deadlock_average = []
     scores = []
     dones_list = []
     #Metrics
@@ -158,7 +150,6 @@ def main(argv):
 
     for trials in range(1, n_trials + 1):
 
-        #print(torch.cuda.current_device())
         # Reset environment
         obs, info = env.reset(True, True)
         #env_renderer.reset()
@@ -220,20 +211,17 @@ def main(argv):
         done_window.append(tasks_finished / max(1, env.get_num_agents()))
         scores_window.append(score / max_steps)  # save most recent score
         scores.append(np.mean(scores_window))
-        deadlock_window.append(deadlocks.count(1)/max(1, env.get_num_agents()))
-        deadlock_average.append(np.mean(deadlock_window))
         dones_list.append((np.mean(done_window)))
 
         eps_list.append(eps)
         action_prob_list.append(action_prob/ np.sum(action_prob))
         print(
-            '\rTraining {} Agents on ({},{}).\t Episode {}\t Average Score: {:.3f}\tDones: {:.2f} %\tDeadlocks: {:.2f} \tEpsilon: {:.2f} \t Action Probabilities: \t {}'.format(
+            '\rTraining {} Agents on ({},{}).\t Episode {}\t Average Score: {:.3f}\tDones: {:.2f}%\tEpsilon: {:.2f} \t Action Probabilities: \t {}'.format(
                 env.get_num_agents(), x_dim, y_dim,
                 trials,
-                np.mean(scores_window), 
-                100 * np.mean(done_window), np.mean(deadlock_window),
+                np.mean(scores_window),
+                100 * np.mean(done_window),
                 eps, action_prob / np.sum(action_prob)), end=" ")
-
 
         if trials % 100 == 0:
             print(
@@ -252,7 +240,7 @@ def main(argv):
 
             #np.savetxt(fname=path.join('Nets' , 'scores_metric.txt'), X=scores)
             #np.savetxt(fname=path.join('Nets' , 'dones_metric.txt'), X=dones_list)
-            np.savetxt(fname=path.join('Nets' , 'metrics.csv'), X=np.transpose(np.asarray([scores,dones_list,deadlock_average,eps_list])), delimiter=';',newline='\n')
+            np.savetxt(fname=path.join('Nets' , 'metrics.csv'), X=np.transpose(np.asarray([scores,dones_list,eps_list])), delimiter=';',newline='\n')
             np.savetxt(fname=path.join('Nets' , 'action_prob.csv'), X=np.asarray(action_prob_list), delimiter=';',newline='\n')
 
 

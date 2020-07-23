@@ -26,10 +26,6 @@ from flatland.envs.predictions import  ShortestPathPredictorForRailEnv
 from os import path
 
 
-#print(torch.cuda.current_device())
-#print(torch.cuda.is_available())
-#print(torch.cuda.get_device_name(device=0))
-
 
 def main(argv):
     try:
@@ -45,7 +41,7 @@ def main(argv):
     np.random.seed(1)
 
     # Parameters for the Environment
-    multi_agent_setup = 3
+    multi_agent_setup = 8
     # 3 agents
     if multi_agent_setup == 3:
         x_dim = 40
@@ -73,6 +69,22 @@ def main(argv):
         max_rails_between_cities = 4
         max_rails_in_city = 4
 
+    if multi_agent_setup == 8:
+        
+        x_dim = 16*3
+        y_dim = 9*3
+        n_agents = 5
+        max_num_cities = 5
+        max_rails_between_cities = 2
+        max_rails_in_city = 3
+        
+        x_dim1 = 16*4
+        y_dim1 = 9*4
+        n_agents1 = 5
+        max_num_cities1 = 9
+        max_rails_between_cities1 = 5
+        max_rails_in_city1 = 5
+
     # Use a the malfunction generator to break agents from time to time
 #    stochastic_data = {'malfunction_rate': 8000,  # Rate of malfunction occurence of single agent
 #                       'min_duration': 15,  # Minimal duration of malfunction
@@ -83,7 +95,7 @@ def main(argv):
     tree_depth = 2
     TreeObservation = TreeObsForRailEnv(max_depth=tree_depth, predictor=ShortestPathPredictorForRailEnv(20))
 
-    np.savetxt(fname=path.join('Nets' , 'info.txt'), X=[x_dim,y_dim,n_agents,max_num_cities,max_rails_between_cities,max_rails_in_city,tree_depth],delimiter=';')
+    #np.savetxt(fname=path.join('Nets' , 'info.txt'), X=[x_dim,y_dim,n_agents,max_num_cities,max_rails_between_cities,max_rails_in_city,tree_depth],delimiter=';')
 
     # Different agent types (trains) with different speeds.
     speed_ration_map = {1.: 1.0,  # Fast passenger train
@@ -105,12 +117,32 @@ def main(argv):
                   # Malfunction data generator
                   obs_builder_object=TreeObservation)
 
+    env1 = RailEnv(width=x_dim1,
+                  height=y_dim1,
+                  rail_generator=sparse_rail_generator(max_num_cities=max_num_cities1,
+                                                       # Number of cities in map (where train stations are)
+                                                       seed=786,  # Random seed
+                                                       grid_mode=False,
+                                                       max_rails_between_cities=max_rails_between_cities1,
+                                                       max_rails_in_city=max_rails_in_city1),
+                  schedule_generator=sparse_schedule_generator(speed_ration_map),
+                  number_of_agents=n_agents1,
+#                  malfunction_generator_and_process_data=malfunction_from_params(stochastic_data),
+                  # Malfunction data generator
+                  obs_builder_object=TreeObservation)
+                
     env.reset(True, True)
+    env1.reset(True, True)
 
     # After training we want to render the results so we also load a renderer
-    env_renderer = RenderTool(env, gl="PILSVG", 
-                                   screen_height=800,  # Adjust these parameters to fit your resolution
-                                   screen_width=900)
+    #env_renderer = RenderTool(env, gl="PILSVG", 
+    #                               screen_height=800,  # Adjust these parameters to fit your resolution
+    #                               screen_width=900)
+
+    #env1_renderer = RenderTool(env1, gl="PILSVG", 
+    #                               screen_height=800,  # Adjust these parameters to fit your resolution
+    #                               screen_width=900)
+    
     # Given the depth of the tree observation and the number of features per node we get the following state_size
     num_features_per_node = env.obs_builder.observation_dim
 
@@ -128,11 +160,12 @@ def main(argv):
 
     # And the max number of steps we want to take per episode
     max_steps = int(3 * (env.height + env.width))
+    max_steps1 = int(3 * (env1.height + env1.width))
 
     # Define training parameters
     eps = 1.
     eps_end = 0.005
-    eps_decay = 0.998
+    eps_decay = 0.999
 
     # And some variables to keep track of the progress
     action_dict = dict()
@@ -158,57 +191,111 @@ def main(argv):
 
     for trials in range(1, n_trials + 1):
 
-        #print(torch.cuda.current_device())
-        # Reset environment
-        obs, info = env.reset(True, True)
-        #env_renderer.reset()
-        # Build agent specific observations
-        for a in range(env.get_num_agents()):
-            if obs[a]:
-                agent_obs[a] = normalize_observation(obs[a], tree_depth, observation_radius=10)
-                agent_obs_buffer[a] = agent_obs[a].copy()
+        if trials%2 == 0:
+            # Reset environment
+            obs, info = env.reset(True, True)
+            #env_renderer.reset()
+            # Build agent specific observations
+            for a in range(env.get_num_agents()):
+                if obs[a]:
+                    agent_obs[a] = normalize_observation(obs[a], tree_depth, observation_radius=10)
+                    agent_obs_buffer[a] = agent_obs[a].copy()
 
         # Reset score and done
-        score = 0
-        env_done = 0
+            score = 0
+            env_done = 0
 
         # Run episode
-        for step in range(max_steps):
+            for step in range(max_steps):
             # Action
-            for a in range(env.get_num_agents()):
-                if info['action_required'][a]:
+                for a in range(env.get_num_agents()):
+                    if info['action_required'][a]:
                     # If an action is require, we want to store the obs a that step as well as the action
-                    update_values = True
-                    action = agent.act(agent_obs[a], eps=eps)
-                    action_prob[action] += 1
-                else:
-                    update_values = False
-                    action = 0
-                action_dict.update({a: action})
+                        update_values = True
+                        action = agent.act(agent_obs[a], eps=eps)
+                        action_prob[action] += 1
+                    else:
+                        update_values = False
+                        action = 0
+                        action_dict.update({a: action})
 
-            # Environment step
-            next_obs, all_rewards, done, deadlocks, info = env.step(action_dict)
-            #env_renderer.render_env(show=True, show_predictions=True, show_observations=True)
-            # Update replay buffer and train agent
+              # Environment step
+                next_obs, all_rewards, done, deadlocks, info = env.step(action_dict)
+                #env_renderer.render_env(show=True, show_predictions=True, show_observations=True)
+                # Update replay buffer and train agent
+                for a in range(env.get_num_agents()):
+                   # Only update the values when we are done or when an action was taken and thus relevant information is present
+                    if update_values or done[a]:
+                        agent.step(agent_obs_buffer[a], agent_action_buffer[a], all_rewards[a],
+                                 agent_obs[a], done[a])
+                        cummulated_reward[a] = 0.
+
+                        agent_obs_buffer[a] = agent_obs[a].copy()
+                        agent_action_buffer[a] = action_dict[a]
+                    if next_obs[a]:
+                        agent_obs[a] = normalize_observation(next_obs[a], tree_depth, observation_radius=10)
+
+                    score += all_rewards[a] / env.get_num_agents()
+
+                # Copy observation
+                if done['__all__']:
+                    env_done = 1
+                    break
+
+        else: # Odd trials
+
+            # Reset environment
+            obs, info = env1.reset(True, True)
+            #env1_renderer.reset()
+            # Build agent specific observations
             for a in range(env.get_num_agents()):
-                # Only update the values when we are done or when an action was taken and thus relevant information is present
-                if update_values or done[a]:
-                    agent.step(agent_obs_buffer[a], agent_action_buffer[a], all_rewards[a],
-                               agent_obs[a], done[a])
-                    cummulated_reward[a] = 0.
-
+                if obs[a]:
+                    agent_obs[a] = normalize_observation(obs[a], tree_depth, observation_radius=10)
                     agent_obs_buffer[a] = agent_obs[a].copy()
-                    agent_action_buffer[a] = action_dict[a]
-                if next_obs[a]:
-                    agent_obs[a] = normalize_observation(next_obs[a], tree_depth, observation_radius=10)
 
-                score += all_rewards[a] / env.get_num_agents()
+            # Reset score and done
+            score = 0
+            env_done = 0
 
-            # Copy observation
-            if done['__all__']:
-                env_done = 1
-                break
+        # Run episode
+            for step in range(max_steps1):
+            # Action
+                for a in range(env.get_num_agents()):
+                    if info['action_required'][a]:
+                    # If an action is require, we want to store the obs a that step as well as the action
+                        update_values = True
+                        action = agent.act(agent_obs[a], eps=eps)
+                        action_prob[action] += 1
+                    else:
+                        update_values = False
+                        action = 0
+                    action_dict.update({a: action})
 
+              # Environment step
+                next_obs, all_rewards, done, deadlocks, info = env1.step(action_dict)
+                #env1_renderer.render_env(show=True, show_predictions=True, show_observations=True)
+                # Update replay buffer and train agent
+                for a in range(env.get_num_agents()):
+                   # Only update the values when we are done or when an action was taken and thus relevant information is present
+                    if update_values or done[a]:
+                        agent.step(agent_obs_buffer[a], agent_action_buffer[a], all_rewards[a],
+                                     agent_obs[a], done[a])
+                        cummulated_reward[a] = 0.
+
+                        agent_obs_buffer[a] = agent_obs[a].copy()
+                        agent_action_buffer[a] = action_dict[a]
+                    if next_obs[a]:
+                       agent_obs[a] = normalize_observation(next_obs[a], tree_depth, observation_radius=10)
+
+                    score += all_rewards[a] / env.get_num_agents()
+
+                # Copy observation
+                if done['__all__']:
+                    env_done = 1
+                    break
+        
+        
+        
         # Epsilon decay
         eps = max(eps_end, eps_decay * eps)  # decrease epsilon
 
@@ -218,7 +305,11 @@ def main(argv):
             if done[_idx] == 1:
                 tasks_finished += 1
         done_window.append(tasks_finished / max(1, env.get_num_agents()))
-        scores_window.append(score / max_steps)  # save most recent score
+        
+        if trials % 2== 0:
+            scores_window.append(score / max_steps)  # save most recent score
+        else:
+            scores_window.append(score / max_steps1)
         scores.append(np.mean(scores_window))
         deadlock_window.append(deadlocks.count(1)/max(1, env.get_num_agents()))
         deadlock_average.append(np.mean(deadlock_window))
@@ -226,9 +317,18 @@ def main(argv):
 
         eps_list.append(eps)
         action_prob_list.append(action_prob/ np.sum(action_prob))
+        
+        if trials%2 == 0:
+            x_dim_current = x_dim
+            y_dim_current = y_dim
+        else:
+            x_dim_current = x_dim1
+            y_dim_current = y_dim1
+
         print(
             '\rTraining {} Agents on ({},{}).\t Episode {}\t Average Score: {:.3f}\tDones: {:.2f} %\tDeadlocks: {:.2f} \tEpsilon: {:.2f} \t Action Probabilities: \t {}'.format(
-                env.get_num_agents(), x_dim, y_dim,
+                env.get_num_agents(), 
+                x_dim_current, y_dim_current,
                 trials,
                 np.mean(scores_window), 
                 100 * np.mean(done_window), np.mean(deadlock_window),
@@ -238,7 +338,8 @@ def main(argv):
         if trials % 100 == 0:
             print(
                 '\rTraining {} Agents on ({},{}).\t Episode {}\t Average Score: {:.3f}\tDones: {:.2f}%\tEpsilon: {:.2f} \t Action Probabilities: \t {}'.format(
-                    env.get_num_agents(), x_dim, y_dim,
+                    env.get_num_agents(),
+                    x_dim_current, y_dim_current,
                     trials,
                     np.mean(scores_window),
                     100 * np.mean(done_window),
