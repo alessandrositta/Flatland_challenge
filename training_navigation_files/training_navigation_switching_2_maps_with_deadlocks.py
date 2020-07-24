@@ -216,8 +216,8 @@ def main(argv):
                         action_prob[action] += 1
                     else:
                         update_values = False
-                        action = 0
-                        action_dict.update({a: action})
+                        action = 0 
+                    action_dict.update({a: action})
 
               # Environment step
                 next_obs, all_rewards, done, deadlocks, info = env.step(action_dict)
@@ -319,6 +319,7 @@ def main(argv):
 
             x_dim_current = x_dim
             y_dim_current = y_dim
+            agent_num = env.get_num_agents()
         else:
             for _idx in range(env1.get_num_agents()):
                 if done[_idx] == 1:
@@ -335,6 +336,7 @@ def main(argv):
 
             x_dim_current = x_dim1
             y_dim_current = y_dim1
+            agent_num = env1.get_num_agents()
 
         eps_list.append(eps)
         action_prob_list.append(action_prob/ np.sum(action_prob))
@@ -343,7 +345,7 @@ def main(argv):
 
         print(
             '\rTraining {} Agents on ({},{}).\t Episode {}\t Average Score: {:.3f}\tDones: {:.2f} %\tDeadlocks: {:.2f} \tEpsilon: {:.2f} \t Action Probabilities: \t {}'.format(
-                env.get_num_agents(), 
+                agent_num, 
                 x_dim_current, y_dim_current,
                 trials,
                 np.mean(scores_window), 
