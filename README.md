@@ -21,7 +21,7 @@
 ## Contacts :speech_balloon:
 The project has been developed by Giovanni Montanari, Lorenzo Sarti and Alessandro Sitta (me).
 
-If you have any questions, fell free to ask:
+If you have any questions, feel free to ask:
 
 :email: [alessandro.sitta@live.it](mailto:alessandro.sitta@live.it)
 
