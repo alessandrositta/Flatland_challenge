@@ -6,7 +6,7 @@
 
 ## 1. Dueling Double DQN
 ![](Model.png)
-> The proveded solution has been developed using a Dueling Double DQN. The basic idea has been taken from the two papers :scroll: http://papers.nips.cc/paper/3964-double-q-learning.pdf :scroll: https://arxiv.org/abs/1511.06581.
+> The provided solution has been developed using a Dueling Double DQN. The basic idea has been taken from the two papers :scroll: http://papers.nips.cc/paper/3964-double-q-learning.pdf :scroll: https://arxiv.org/abs/1511.06581.
 
 ## 2. Single Agent
 ![](SingleAgent.gif)
@@ -19,9 +19,10 @@
 ## 4. Final Results
 A summary of the final results obtained during the project is provided in the table:
 ![](final_results1.png)
+Details on the dimensions and complexity of the maps as well as the metrics involved, can be found in the [Complete Paper](Project_Flatland.pdf).
 
 ## Contacts :speech_balloon:
-The project has been developed by Giovanni Montanari, Lorenzo Sarti and Alessandro Sitta (me).
+The project has been developed by Giovanni Montanari, Lorenzo Sarti and Alessandro Sitta (me) in the context of the course "Deep Learning" at the University of Bologna.
 
 If you have any questions, feel free to ask:
 
