@@ -9,3 +9,4 @@
 > The proveded solution has been developed using a Dueling Double DQN. The basic idea has been taken from the two papers :scroll: http://papers.nips.cc/paper/3964-double-q-learning.pdf :scroll: https://arxiv.org/abs/1511.06581.
 
 ## 2. Single Agent
+![](SingleAgent.gif)
