@@ -15,3 +15,16 @@
 ## 3. Multi Agent
 ![](trains_with_malfunctions.gif)
 > Different methods have been used to perform training and testing from 3 up to 10 agents in different environments, including malfunctions and different velocities. For further details refer to the [Complete Paper](Project_Flatland.pdf).
+
+## 4. Final Results
+
+## Contacts :speech_balloon:
+The project has been developed by Giovanni Montanari, Lorenzo Sarti and Alessandro Sitta (me).
+
+If you have any questions, fell free to ask:
+
+:email: [alessandro.sitta@live.it](mailto:alessandro.sitta@live.it)
+
+Github: https://github.com/alessandrositta
+
+LinkedIn: https://www.linkedin.com/in/alessandro-sitta/
