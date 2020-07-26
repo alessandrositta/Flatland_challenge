@@ -5,4 +5,4 @@
 > The repository contains our solutions with relative code to the problem presented in the challenge.
 
 ## 1. Dueling Double DQN
-![alt text](http://url/to/model.png)
+![alt text](http://url/to/Model.png)
