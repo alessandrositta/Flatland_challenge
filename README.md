@@ -10,3 +10,6 @@
 
 ## 2. Single Agent
 ![](SingleAgent.gif)
+> The first interesting solutions concentrats on the Single Agnet case, in which a single train needs to learn how to reach a target in a simple framework. Traning, tests using different techniques are included in the reository and discussed deeply in the paper (mettere link a paper). 
+
+## 3. Multi Agent
