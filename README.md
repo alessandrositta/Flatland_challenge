@@ -17,8 +17,9 @@
 > Different methods have been used to perform training and testing from 3 up to 10 agents in different environments, including malfunctions and different velocities. For further details refer to the [Complete Paper](Project_Flatland.pdf).
 
 ## 4. Final Results
-A summary of the final results obtained during the project is provided in the table:
+A summary of the final results obtained during the project is provided in the tables:
 ![](final_results1.png)
+![](final_results2.png)
 Details on the dimensions and complexity of the maps as well as the metrics involved, can be found in the [Complete Paper](Project_Flatland.pdf).
 
 ## Contacts :speech_balloon:
