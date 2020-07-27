@@ -1,3 +1,18 @@
+#################################################################################
+# Project 5 - Flatland challenge                                               #
+#                                                                               #
+# Definition of the RailEnv environment.                                        #
+#                                                                               #
+# @Giovanni Montanari - Lorenzo Sarti - Alessandro Sitta                        #
+#                                                                               #
+# For any question contact us:                                                  #
+#         mail : alessandro.sitta@live.it                                       #
+#         GitHub: https://github.com/alessandrositta                            #
+#                                                                               #
+# INSTRUCTIONS: To select the different weights, please select the parameters   #
+#               starting from line 121. If you set one parameter to 0 it will   #
+#               not be involved in the reward mechanism.                        #
+#################################################################################
 """
 Definition of the RailEnv environment.
 """
