@@ -13,9 +13,7 @@
 #               starting from line 121. If you set one parameter to 0 it will   #
 #               not be involved in the reward mechanism.                        #
 #################################################################################
-"""
-Definition of the RailEnv environment.
-"""
+
 import random
 # TODO:  _ this is a global method --> utils or remove later
 from enum import IntEnum
