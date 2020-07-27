@@ -1,19 +1,6 @@
-#################################################################################
-# Project 5 - Flatland challenge                                               #
-#                                                                               #
-# Definition of the RailEnv environment.                                        #
-#                                                                               #
-# @Giovanni Montanari - Lorenzo Sarti - Alessandro Sitta                        #
-#                                                                               #
-# For any question contact us:                                                  #
-#         mail : alessandro.sitta@live.it                                       #
-#         GitHub: https://github.com/alessandrositta                            #
-#                                                                               #
-# INSTRUCTIONS: To select the different weights, please select the parameters   #
-#               starting from line 121. If you set one parameter to 0 it will   #
-#               not be involved in the reward mechanism.                        #
-#################################################################################
-
+"""
+Definition of the RailEnv environment.
+"""
 import random
 # TODO:  _ this is a global method --> utils or remove later
 from enum import IntEnum
@@ -116,9 +103,9 @@ class RailEnv(Environment):
     For Round 2, they will be passed to the constructor as arguments, to allow for more flexibility.
 
     """
-    alpha = 1.0
+    alpha = 1
     beta = 10
-    gamma = 1.0
+    gamma = 0
     # Epsilon to avoid rounding errors
     epsilon = 0.01
     invalid_action_penalty = 0  # previously -2; GIACOMO: we decided that invalid actions will carry no penalty
@@ -126,14 +113,18 @@ class RailEnv(Environment):
     global_reward = 1 * beta
     stop_penalty = 0  # penalty for stopping a moving agent
     start_penalty = 0  # penalty for starting a stopped agent
-    #we added this penalty to penalize less the agent in case it is going closer to the target
-    reducing_distance_step = -0.5*gamma
-
-    #we added a penalty in case the agent stops on a switch 
-    stop_on_switch_penalty = -3
     
-    #deadlock penalty in case the agents enter in a deadlock
+    #we added this penalty to penalize less the agent in case it is going closer to the target
+    reducing_distance_step = -1*gamma
+
+    # we added a penalty in case the agent stops on a switch 
+    stop_on_switch_penalty = 0
+    
+    # deadlock penalty in case the agents enter in a deadlock
     deadlock_penalty = -10
+
+    # Standstill penalty
+    not_moving_penalty = 0
 
     def __init__(self,
                  width,
@@ -653,11 +644,16 @@ class RailEnv(Environment):
                     self._move_agent_to_new_position(agent, new_position)
                     agent.direction = new_direction
                     agent.speed_data['position_fraction'] = 0.0
+                    malfunction = 0
                     self.deadlocks[i_agent] = 0
                     self.wait_deadlock[i_agent] = 0
                 else:
                 		self.wait_deadlock[i_agent] += 1
-                		if self.wait_deadlock[i_agent] == 2:
+                		for i in range(self.get_num_agents()):
+                			if self.agents[i].position == new_position:
+                				malfunction = self.agents[i].malfunction_data['malfunction'] > 0
+                		
+                		if (self.wait_deadlock[i_agent] == 2) and (not malfunction):
                 				self.rewards_dict[i_agent] = self.deadlock_penalty
                 				self.deadlocks[i_agent] = 1
 
@@ -683,6 +679,8 @@ class RailEnv(Environment):
         else:
             # step penalty if not moving (stopped now or before)
             self.rewards_dict[i_agent] += self.step_penalty * agent.speed_data['speed']
+            # Additional penalty for not moving
+            self.rewards_dict[i_agent] += self.not_moving_penalty * agent.speed_data['speed']
 
     def _set_agent_to_initial_position(self, agent: EnvAgent, new_position: IntVector2D):
         """
