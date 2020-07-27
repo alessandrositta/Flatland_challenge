@@ -5,21 +5,21 @@
 > The repository contains our solutions with relative code to the problem presented in the challenge.
 
 ## 1. Dueling Double DQN
-![](Model.png)
+![](Images/Model.png)
 > The provided solution has been developed using a Dueling Double DQN. The basic idea has been taken from the two papers :scroll: http://papers.nips.cc/paper/3964-double-q-learning.pdf :scroll: https://arxiv.org/abs/1511.06581.
 
 ## 2. Single Agent
-![](SingleAgent.gif)
+![](Images/SingleAgent.gif)
 > The first interesting solutions concentrats on the Single Agnet case, in which a single train needs to learn how to reach a target in a simple framework. Traning, tests and results using different techniques are included in the reository and discussed deeply in the [Complete Paper](Project_Flatland.pdf). 
 
 ## 3. Multi Agent
-![](trains_with_malfunctions.gif)
+![](Images/trains_with_malfunctions.gif)
 > Different methods have been used to perform training and testing from 3 up to 10 agents in different environments, including malfunctions and different velocities. For further details refer to the [Complete Paper](Project_Flatland.pdf).
 
 ## 4. Final Results
 A summary of the final results obtained during the project is provided in the tables:
-![](final_results1.png)
-![](final_results2.png)
+![](Images/final_results1.png)
+![](Images/final_results2.png)
 Details on the dimensions and complexity of the maps as well as the metrics involved, can be found in the [Complete Paper](Project_Flatland.pdf).
 
 ## Contacts :speech_balloon:
