@@ -26,10 +26,6 @@ from flatland.envs.predictions import  ShortestPathPredictorForRailEnv
 from os import path
 
 
-#print(torch.cuda.current_device())
-#print(torch.cuda.is_available())
-#print(torch.cuda.get_device_name(device=0))
-
 
 def main(argv):
     try:
@@ -44,9 +40,24 @@ def main(argv):
     random.seed(1)
     np.random.seed(1)
 
-    # Parameters for the Environment
-    multi_agent_setup = 3
-    # 3 agents
+    #### Choose the desired setup ####
+
+    multi_agent_setup = 1
+    malfunctions_enabled = False
+    agents_one_speed = True
+
+    ##################################
+
+    # Single agent (1)
+    if multi_agent_setup == 1:
+        x_dim = 35
+        y_dim = 35
+        n_agents = 1
+        max_num_cities = 3
+        max_rails_between_cities = 2
+        max_rails_in_city = 3
+
+    # Multi agent (3)
     if multi_agent_setup == 3:
         x_dim = 40
         y_dim = 40
@@ -64,20 +75,20 @@ def main(argv):
         max_rails_between_cities = 2
         max_rails_in_city = 3
 
-    # Multi agent (7)
-    if multi_agent_setup == 7:
+    # Multi agent (10)
+    if multi_agent_setup == 10:
         x_dim = 16*4
         y_dim = 9*4
-        n_agents = 7
-        max_num_cities = 7
-        max_rails_between_cities = 4
-        max_rails_in_city = 4
+        n_agents = 10
+        max_num_cities = 9
+        max_rails_between_cities = 5
+        max_rails_in_city = 5
 
     # Use a the malfunction generator to break agents from time to time
-#    stochastic_data = {'malfunction_rate': 8000,  # Rate of malfunction occurence of single agent
-#                       'min_duration': 15,  # Minimal duration of malfunction
-#                       'max_duration': 50  # Max duration of malfunction
-#                       }
+    stochastic_data = {'malfunction_rate': 80,  # Rate of malfunction occurence of single agent
+                       'min_duration': 15,  # Minimal duration of malfunction
+                       'max_duration': 50  # Max duration of malfunction
+                       }
 
     # Custom observation builder
     tree_depth = 2
@@ -85,25 +96,44 @@ def main(argv):
 
     np.savetxt(fname=path.join('Nets' , 'info.txt'), X=[x_dim,y_dim,n_agents,max_num_cities,max_rails_between_cities,max_rails_in_city,tree_depth],delimiter=';')
 
-    # Different agent types (trains) with different speeds.
-    speed_ration_map = {1.: 1.0,  # Fast passenger train
-                        1. / 2.: 0.0,  # Fast freight train
-                        1. / 3.: 0.0,  # Slow commuter train
-                        1. / 4.: 0.0}  # Slow freight train
+# Different agent types (trains) with different speeds.
+    if agents_one_speed:
+        speed_ration_map = {1.: 1.,  # Fast passenger train
+                            1. / 2.: 0.0,  # Fast freight train
+                            1. / 3.: 0.0,  # Slow commuter train
+                            1. / 4.: 0.0}  # Slow freight train
+    else:
+        speed_ration_map = {1.: 0.25,  # Fast passenger train
+                            1. / 2.: 0.25,  # Fast freight train
+                            1. / 3.: 0.25,  # Slow commuter train
+                            1. / 4.: 0.25}  # Slow freight train
 
-    env = RailEnv(width=x_dim,
-                  height=y_dim,
-                  rail_generator=sparse_rail_generator(max_num_cities=max_num_cities,
-                                                       # Number of cities in map (where train stations are)
-                                                       seed=1,  # Random seed
-                                                       grid_mode=False,
-                                                       max_rails_between_cities=max_rails_between_cities,
-                                                       max_rails_in_city=max_rails_in_city),
-                  schedule_generator=sparse_schedule_generator(speed_ration_map),
-                  number_of_agents=n_agents,
-#                  malfunction_generator_and_process_data=malfunction_from_params(stochastic_data),
-                  # Malfunction data generator
-                  obs_builder_object=TreeObservation)
+    
+    if malfunctions_enabled:
+        env = RailEnv(width=x_dim,
+                      height=y_dim,
+                      rail_generator=sparse_rail_generator(max_num_cities=max_num_cities,
+                                                           # Number of cities in map (where train stations are)
+                                                           seed=14,  # Random seed
+                                                           grid_mode=False,
+                                                           max_rails_between_cities=max_rails_between_cities,
+                                                               max_rails_in_city=max_rails_in_city),
+                    schedule_generator=sparse_schedule_generator(speed_ration_map),
+                    malfunction_generator_and_process_data=malfunction_from_params(stochastic_data),
+                    number_of_agents=n_agents,
+                    obs_builder_object=TreeObservation)
+    else:
+        env = RailEnv(width=x_dim,
+                      height=y_dim,
+                      rail_generator=sparse_rail_generator(max_num_cities=max_num_cities,
+                                                           # Number of cities in map (where train stations are)
+                                                           seed=14,  # Random seed
+                                                           grid_mode=False,
+                                                           max_rails_between_cities=max_rails_between_cities,
+                                                               max_rails_in_city=max_rails_in_city),
+                    schedule_generator=sparse_schedule_generator(speed_ration_map),
+                    number_of_agents=n_agents,
+                    obs_builder_object=TreeObservation)
 
     env.reset(True, True)
 
@@ -245,13 +275,11 @@ def main(argv):
                     eps, action_prob / np.sum(action_prob)))
             torch.save(agent.qnetwork_local.state_dict(),
                        path.join('Nets',('navigator_checkpoint' +str(trials) + '.pth')))
-            # agent.save(path.join('Nets',('checkpoint_' +str(trials))))
+
             action_prob = [1] * action_size
 
         if trials % 50 == 0:
 
-            #np.savetxt(fname=path.join('Nets' , 'scores_metric.txt'), X=scores)
-            #np.savetxt(fname=path.join('Nets' , 'dones_metric.txt'), X=dones_list)
             np.savetxt(fname=path.join('Nets' , 'metrics.csv'), X=np.transpose(np.asarray([scores,dones_list,deadlock_average,eps_list])), delimiter=';',newline='\n')
             np.savetxt(fname=path.join('Nets' , 'action_prob.csv'), X=np.asarray(action_prob_list), delimiter=';',newline='\n')
 

@@ -41,49 +41,22 @@ def main(argv):
     np.random.seed(1)
 
     # Parameters for the Environment
-    multi_agent_setup = 8
-    # 3 agents
-    if multi_agent_setup == 3:
-        x_dim = 40
-        y_dim = 40
-        n_agents = 3
-        max_num_cities = 4
-        max_rails_between_cities = 2
-        max_rails_in_city = 3
 
-    # Multi agent (5)
-    if multi_agent_setup == 5:
-        x_dim = 16*3
-        y_dim = 9*3
-        n_agents = 5
-        max_num_cities = 5
-        max_rails_between_cities = 2
-        max_rails_in_city = 3
+    # Multi agent (4000 iterations)
+    x_dim = 16*3
+    y_dim = 9*3
+    n_agents = 5
+    max_num_cities = 5
+    max_rails_between_cities = 2
+    max_rails_in_city = 3
 
-    # Multi agent (7)
-    if multi_agent_setup == 7:
-        x_dim = 16*4
-        y_dim = 9*4
-        n_agents = 7
-        max_num_cities = 7
-        max_rails_between_cities = 4
-        max_rails_in_city = 4
-
-    if multi_agent_setup == 8:
-        
-        x_dim = 16*3
-        y_dim = 9*3
-        n_agents = 5
-        max_num_cities = 5
-        max_rails_between_cities = 2
-        max_rails_in_city = 3
-        
-        x_dim1 = 16*4
-        y_dim1 = 9*4
-        n_agents1 = 1
-        max_num_cities1 = 9
-        max_rails_between_cities1 = 5
-        max_rails_in_city1 = 5
+    # Single agent (1000 iterations)    
+    x_dim1 = 16*4
+    y_dim1 = 9*4
+    n_agents1 = 1
+    max_num_cities1 = 9
+    max_rails_between_cities1 = 5
+    max_rails_in_city1 = 5
 
     # Use a the malfunction generator to break agents from time to time
 #    stochastic_data = {'malfunction_rate': 8000,  # Rate of malfunction occurence of single agent
@@ -94,8 +67,6 @@ def main(argv):
     # Custom observation builder
     tree_depth = 2
     TreeObservation = TreeObsForRailEnv(max_depth=tree_depth, predictor=ShortestPathPredictorForRailEnv(20))
-
-    #np.savetxt(fname=path.join('Nets' , 'info.txt'), X=[x_dim,y_dim,n_agents,max_num_cities,max_rails_between_cities,max_rails_in_city,tree_depth],delimiter=';')
 
     # Different agent types (trains) with different speeds.
     speed_ration_map = {1.: 1.0,  # Fast passenger train
@@ -165,7 +136,7 @@ def main(argv):
     # Define training parameters
     eps = 1.
     eps_end = 0.005
-    eps_decay = 0.999
+    eps_decay = 0.9985
 
     # And some variables to keep track of the progress
     action_dict = dict()
@@ -364,13 +335,11 @@ def main(argv):
                     eps, action_prob / np.sum(action_prob)))
             torch.save(agent.qnetwork_local.state_dict(),
                        path.join('Nets',('navigator_checkpoint' +str(trials) + '.pth')))
-            # agent.save(path.join('Nets',('checkpoint_' +str(trials))))
+
             action_prob = [1] * action_size
 
         if trials % 50 == 0:
 
-            #np.savetxt(fname=path.join('Nets' , 'scores_metric.txt'), X=scores)
-            #np.savetxt(fname=path.join('Nets' , 'dones_metric.txt'), X=dones_list)
             np.savetxt(fname=path.join('Nets' , 'metrics.csv'), X=np.transpose(np.asarray([scores,dones_list,deadlock_average,eps_list])), delimiter=';',newline='\n')
             np.savetxt(fname=path.join('Nets' , 'action_prob.csv'), X=np.asarray(action_prob_list), delimiter=';',newline='\n')
 

@@ -42,32 +42,6 @@ def main(argv):
 
     # Parameters for the Environment
     multi_agent_setup = 8
-    # 3 agents
-    if multi_agent_setup == 3:
-        x_dim = 40
-        y_dim = 40
-        n_agents = 3
-        max_num_cities = 4
-        max_rails_between_cities = 2
-        max_rails_in_city = 3
-
-    # Multi agent (5)
-    if multi_agent_setup == 5:
-        x_dim = 16*3
-        y_dim = 9*3
-        n_agents = 5
-        max_num_cities = 5
-        max_rails_between_cities = 2
-        max_rails_in_city = 3
-
-    # Multi agent (7)
-    if multi_agent_setup == 7:
-        x_dim = 16*4
-        y_dim = 9*4
-        n_agents = 7
-        max_num_cities = 7
-        max_rails_between_cities = 4
-        max_rails_in_city = 4
 
     if multi_agent_setup == 8:
         
