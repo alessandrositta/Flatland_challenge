@@ -19,7 +19,7 @@
 ## 4. Final Results
 A summary of the final results obtained during the project is provided in the tables:
 ![](Images/final_results1.png)
-![](Images/final_results2.png)
+![](Images/final_results_malfunction.png)
 
 The Medium size and Big size maps are of the kind:
 
