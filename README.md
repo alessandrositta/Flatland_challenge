@@ -20,8 +20,11 @@
 A summary of the final results obtained during the project is provided in the tables:
 ![](Images/final_results1.png)
 ![](Images/final_results2.png)
+
 The Medium size and Big size maps are of the kind:
+
 ![](Images/Medium.png)
+
 Further details on the dimensions and complexity of the maps as well as the metrics involved, can be found in the [Complete Paper](Project_Flatland.pdf).
 
 ## Contacts :speech_balloon:
