@@ -1,0 +1,115 @@
+image: themattrix/tox
+
+##########################################
+##########################################
+## We have to set the following env vars
+## in the admin interface :
+## - AWS_DEFAULT_REGION
+## - BUCKET_NAME
+## - AWS_ACCESS_KEY_ID
+## - AWS_SECRET_ACCESS_KEY
+
+stages:
+    - tests
+    - integration_testing
+    - profiling
+    - benchmarks
+    - deploy_docs
+cache:
+    paths:
+        - .tox
+
+before_script:
+    - echo "Setting Up...."
+
+tests:
+    stage: tests
+    before_script:
+        - apt update
+        - apt install -y libgl1-mesa-glx xvfb graphviz xdg-utils libcairo2-dev libjpeg-dev libgif-dev
+        - wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/Miniconda3-latest-Linux-x86_64.sh
+        - bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /tmp/miniconda3
+        - export PATH=/tmp/miniconda3/bin:$PATH
+        - pip install tox awscli
+        - conda update -n root conda -y
+        - conda install -c conda-forge tox-conda
+    script:
+        - xvfb-run tox -v --recreate
+
+build_and_deploy_docs:
+    image: "python:latest"
+    stage: deploy_docs
+    only:
+        - master
+    dependencies:
+        - tests
+    before_script:
+        - apt update
+        - apt install -y libgl1-mesa-glx xvfb xdg-utils libcairo2-dev libjpeg-dev libgif-dev
+        - wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/Miniconda3-latest-Linux-x86_64.sh
+        - bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /tmp/miniconda3
+        - export PATH=/tmp/miniconda3/bin:$PATH
+        - pip install tox awscli
+        - conda update -n root conda -y
+        - conda install -c conda-forge tox-conda
+    script:
+        - echo "Bucket=${BUCKET_NAME}"
+        - echo "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}"
+        - echo "CI_COMMIT_REF_SLUG=${CI_COMMIT_REF_SLUG}"
+        - xvfb-run tox -v -e docs --recreate
+        - aws s3 cp ./docs/_build/html/ s3://${BUCKET_NAME} --recursive
+    environment:
+        name: ${CI_COMMIT_REF_SLUG}
+        url: http://${BUCKET_NAME}.s3-website.${AWS_DEFAULT_REGION}.amazonaws.com/
+
+profiling:
+    dependencies:
+        - tests
+    stage: profiling
+    only:
+        variables:
+            - $BENCHMARKS_AND_PROFILING
+    before_script:
+        - apt update
+        - apt install -y libgl1-mesa-glx xvfb xdg-utils libcairo2-dev libjpeg-dev libgif-dev
+        - wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/Miniconda3-latest-Linux-x86_64.sh
+        - bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /tmp/miniconda3
+        - export PATH=/tmp/miniconda3/bin:$PATH
+        - pip install tox awscli
+        - conda update -n root conda -y
+        - conda install -c conda-forge tox-conda
+    script:
+        - xvfb-run tox -e profiling -v --recreate
+
+benchmarks:
+    dependencies:
+        - tests
+    stage: benchmarks
+    only:
+        variables:
+            - $BENCHMARKS_AND_PROFILING
+    before_script:
+        - apt update
+        - apt install -y libgl1-mesa-glx xvfb xdg-utils libcairo2-dev libjpeg-dev libgif-dev
+        - wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/Miniconda3-latest-Linux-x86_64.sh
+        - bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /tmp/miniconda3
+        - export PATH=/tmp/miniconda3/bin:$PATH
+        - pip install tox awscli
+        - conda update -n root conda -y
+        - conda install -c conda-forge tox-conda
+    script:
+        - xvfb-run tox -e benchmarks -v --recreate
+
+test_conda_setup:
+    stage: integration_testing
+    before_script:
+        - apt update
+        - apt install -y libgl1-mesa-glx xvfb xdg-utils libcairo2-dev libjpeg-dev libgif-dev
+        - wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/Miniconda3-latest-Linux-x86_64.sh
+        - bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /tmp/miniconda3
+        - export PATH=/tmp/miniconda3/bin:$PATH
+        - conda update -n root conda -y
+    script:
+        - xvfb-run bash getting_started/getting_started.sh
+
+
