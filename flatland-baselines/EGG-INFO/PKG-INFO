@@ -1,0 +1,16 @@
+Metadata-Version: 1.1
+Name: flatland-rl-baselines
+Version: 0.1.1
+Summary: Multi Agent Reinforcement Learning on Trains
+Home-page: https://gitlab.aicrowd.com/flatland/baselines
+Author: S.P. Mohanty
+Author-email: mohanty@aicrowd.com
+License: UNKNOWN
+Description: UNKNOWN
+Keywords: flatland-baselines
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
