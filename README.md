@@ -20,7 +20,9 @@
 A summary of the final results obtained during the project is provided in the tables:
 ![](Images/final_results1.png)
 ![](Images/final_results2.png)
-Details on the dimensions and complexity of the maps as well as the metrics involved, can be found in the [Complete Paper](Project_Flatland.pdf).
+The Medium size and Big size maps are of the kind:
+![](Images/Medium.png)
+Further details on the dimensions and complexity of the maps as well as the metrics involved, can be found in the [Complete Paper](Project_Flatland.pdf).
 
 ## Contacts :speech_balloon:
 The project has been developed by Giovanni Montanari, Lorenzo Sarti and Alessandro Sitta (me) in the context of the course "Deep Learning" at the University of Bologna.
