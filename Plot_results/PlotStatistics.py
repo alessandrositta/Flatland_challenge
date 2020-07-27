@@ -1,3 +1,18 @@
+#################################################################################
+# Project 5 - Flatland challenge                                               #
+#                                                                               #
+# Plot and save results from metrics and action probailities files              #
+#                                                                               #
+# @Giovanni Montanari - Lorenzo Sarti - Alessandro Sitta                        #
+#                                                                               #
+# For any question contact us:                                                  #
+#         mail : alessandro.sitta@live.it                                       #
+#         GitHub: https://github.com/alessandrositta                            #
+#                                                                               #
+# INSTRUCTIONS: To select the desired file change the datapath at line 32.      #
+#                                                                               #
+#################################################################################
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
