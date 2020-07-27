@@ -1,10 +1,13 @@
 #################################################################################
-# Projcect 5 - Flatland challenge                                               #
+# Project 5 - Flatland challenge                                               #
 #                                                                               #
 # Test set code - for Results comparison                                        #
 #                                                                               #
 # @Giovanni Montanari - Lorenzo Sarti - Alessandro Sitta                        #
 #                                                                               #
+# For any question contact us:                                                  #
+#         mail : alessandro.sitta@live.it                                       #
+#         GitHub: https://github.com/alessandrositta                            #
 #                                                                               #
 # INSTRUCTIONS: To select the test set, please select the parameters at line 52.#
 #               Results will be saved in a folder named 'NetsTest'. Please load #
