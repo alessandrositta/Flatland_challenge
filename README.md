@@ -10,11 +10,11 @@
 
 ## 2. Single Agent
 ![](Images/SingleAgent.gif)
-> The first interesting solutions have been developed on the Single Agnet case, in which a single train needs to learn how to reach a target in a simple framework. Traning, tests and results using different techniques are included in the reository and discussed deeply in the [Complete Paper](Project_Flatland.pdf). 
+> The first interesting solutions have been developed on the Single Agnet case, in which a single train needs to learn how to reach a target in a simple framework. Traning, tests and results using different techniques are included in the reository and discussed deeply in the [Complete Paper](Flatland_Challenge_project.pdf). 
 
 ## 3. Multi Agent
 ![](Images/trains_with_malfunctions.gif)
-> Different methods have been used to perform training and testing from 3 up to 10 agents in different environments, including malfunctions and different trains' velocities. For further details refer to the [Complete Paper](Project_Flatland.pdf).
+> Different methods have been used to perform training and testing from 3 up to 10 agents in different environments, including malfunctions and different trains' velocities. For further details refer to the [Complete Paper](Flatland_Challenge_project.pdf).
 
 ## 4. Final Results
 A summary of the final results obtained during the project is provided in the tables:
@@ -25,7 +25,7 @@ The Medium size and Big size maps are of the kind:
 
 ![](Images/Medium.png)
 
-Further details on the dimensions and complexity of the maps as well as the metrics involved, can be found in the [Complete Paper](Project_Flatland.pdf).
+Further details on the dimensions and complexity of the maps as well as the metrics involved, can be found in the [Complete Paper](Flatland_Challenge_project.pdf).
 
 ## Contacts :speech_balloon:
 The project has been developed by Giovanni Montanari, Lorenzo Sarti and Alessandro Sitta (me) in the context of the course "Deep Learning" at the University of Bologna.
